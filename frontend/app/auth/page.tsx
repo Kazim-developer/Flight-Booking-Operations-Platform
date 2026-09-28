@@ -29,7 +29,7 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={() => setUserType("traveler")}
-              className="rounded-xl border border-gray-200 bg-white p-6 text-left transition hover:border-gray-400 hover:shadow-sm"
+              className="rounded-xl border border-gray-200 bg-white p-6 text-left transition hover:border-black hover:shadow-sm"
             >
               <div className="mb-4 text-2xl">✈️</div>
 
@@ -43,7 +43,7 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={() => setUserType("airline")}
-              className="rounded-xl border border-gray-200 bg-white p-6 text-left transition hover:border-gray-400 hover:shadow-sm"
+              className="rounded-xl border border-gray-200 bg-white p-6 text-left transition hover:border-black hover:shadow-sm"
             >
               <div className="mb-4 text-2xl">🏢</div>
 
@@ -62,7 +62,7 @@ export default function AuthPage() {
             <button
               type="button"
               onClick={() => setUserType(null)}
-              className="mb-6 text-sm text-gray-500 transition hover:text-gray-900"
+              className="mb-6 text-sm text-gray-500 transition hover:text-gray-900 cursor-pointer"
             >
               ← Back
             </button>
