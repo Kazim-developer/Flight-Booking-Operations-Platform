@@ -8,7 +8,14 @@ import {
   AirlineSignupDto,
   AirlineSignupResponseDto,
 } from './dto/airlineSignup.dto';
-import { TravelerLoginDto } from './dto/travelerLogin.dto';
+import {
+  TravelerLoginDto,
+  TravelerLoginResponseDto,
+} from './dto/travelerLogin.dto';
+import {
+  AirlineLoginDto,
+  AirlineLoginResponseDto,
+} from './dto/airlineLogin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +36,16 @@ export class AuthController {
   }
 
   @Post('traveler-login')
-  travelerLogin(@Body() travelerInputData: TravelerLoginDto) {
+  travelerLogin(
+    @Body() travelerInputData: TravelerLoginDto,
+  ): Promise<TravelerLoginResponseDto> {
     return this.authService.travelerLogin(travelerInputData);
+  }
+
+  @Post('airline-login')
+  airlineLogin(
+    @Body() airlineInputData: AirlineLoginDto,
+  ): Promise<AirlineLoginResponseDto> {
+    return this.authService.airlineLogin(airlineInputData);
   }
 }
