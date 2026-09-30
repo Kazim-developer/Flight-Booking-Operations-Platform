@@ -1,10 +1,15 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ShowPasswordCheckbox from "./ShowPasswordCheckbox";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { postFormData } from "@/handlers/postFormData";
+import { toast } from "react-toastify";
+import { hasErrors } from "@/utils/hasErrors.util";
 
-interface AIRLINEFORM {
+export interface AIRLINEFORM {
   name: string;
   email: string;
   iaatCode: string;
@@ -21,6 +26,36 @@ export default function AirlineForm() {
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
+  const nameRef = useRef<HTMLInputElement>(null);
+
+  const router = useRouter();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (airlineForm: AIRLINEFORM) =>
+      postFormData("auth/airline-signup", airlineForm),
+    onSuccess: () => {
+      toast.success(
+        "airline account has been created successfully, redirecting ...",
+      );
+      setTimeout(() => {
+        router.replace("auth/login");
+      }, 3000);
+    },
+    onError: (error) => {
+      if (hasErrors(error)) {
+        Object.values(error.errors).forEach((msg) => {
+          toast.error(String(msg));
+        });
+      } else {
+        toast.error(error.message || "Something went wrong");
+      }
+    },
+  });
+
+  useEffect(() => {
+    nameRef.current?.focus();
+  }, []);
+
   return (
     <div>
       <div className={clsx("flex flex-col gap-5")}>
@@ -34,7 +69,13 @@ export default function AirlineForm() {
           </p>
         </div>
 
-        <form className={clsx("flex flex-col gap-5")}>
+        <form
+          className={clsx("flex flex-col gap-5")}
+          onSubmit={(e) => {
+            e.preventDefault();
+            mutate(airlineForm);
+          }}
+        >
           {/* Airline name */}
           <div>
             <label
@@ -48,6 +89,7 @@ export default function AirlineForm() {
               id="airline-name"
               name="airlineName"
               type="text"
+              ref={nameRef}
               placeholder="Example Airlines"
               required
               className={clsx(
@@ -143,7 +185,7 @@ export default function AirlineForm() {
               "bg-black text-white p-3 text-bold cursor-pointer rounded-lg",
             )}
           >
-            Create airline account
+            {isPending ? "Creating account ..." : "Create airline account"}
           </button>
         </form>
       </div>

@@ -1,10 +1,15 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ShowPasswordCheckbox from "./ShowPasswordCheckbox";
+import { useMutation } from "@tanstack/react-query";
+import { postFormData } from "@/handlers/postFormData";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { hasErrors } from "@/utils/hasErrors.util";
 
-interface TRAVELERFORM {
+export interface TRAVELERFORM {
   fullName: string;
   email: string;
   phone: string;
@@ -20,6 +25,34 @@ export default function TravelerForm() {
     password: "",
   });
 
+  const nameRef = useRef<HTMLInputElement>(null);
+
+  const router = useRouter();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (travelerForm: TRAVELERFORM) =>
+      postFormData("auth/traveler-signup", travelerForm),
+    onSuccess: () => {
+      toast.success("account has been created successfully, redirecting ...");
+      setTimeout(() => {
+        router.replace("auth/login");
+      }, 3000);
+    },
+    onError: (error) => {
+      if (hasErrors(error)) {
+        Object.values(error.errors).forEach((msg) => {
+          toast.error(String(msg));
+        });
+      } else {
+        toast.error(error.message || "Something went wrong");
+      }
+    },
+  });
+
+  useEffect(() => {
+    nameRef.current?.focus();
+  }, []);
+
   return (
     <div>
       <div className={clsx("flex flex-col gap-5")}>
@@ -33,7 +66,13 @@ export default function TravelerForm() {
           </p>
         </div>
 
-        <form className={clsx("flex flex-col gap-5")}>
+        <form
+          className={clsx("flex flex-col gap-5")}
+          onSubmit={(e) => {
+            e.preventDefault();
+            mutate(travelerForm);
+          }}
+        >
           {/* Full name */}
           <div>
             <label
@@ -46,6 +85,7 @@ export default function TravelerForm() {
             <input
               id="fullName"
               name="fullName"
+              ref={nameRef}
               type="text"
               placeholder="Ali Raza"
               required
@@ -136,7 +176,7 @@ export default function TravelerForm() {
               "bg-black text-white p-3 text-bold cursor-pointer rounded-lg",
             )}
           >
-            Sign Up
+            {isPending ? "Signing in ..." : "Sign Up"}
           </button>
         </form>
       </div>
