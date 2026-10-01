@@ -1,6 +1,6 @@
-import { AIRLINEFORM } from "@/app/auth/components/AirlineForm";
+import { AIRLINEFORM } from "@/app/auth/components/AirlineSignupForm";
 import { AIRLINELOGIN } from "@/app/auth/components/AirlineLoginForm";
-import { TRAVELERFORM } from "@/app/auth/components/TravelerForm";
+import { TRAVELERFORM } from "@/app/auth/components/TravelerSignupForm";
 import { TRAVELERLOGIN } from "@/app/auth/components/TravelerLoginForm";
 
 export const postFormData = async (

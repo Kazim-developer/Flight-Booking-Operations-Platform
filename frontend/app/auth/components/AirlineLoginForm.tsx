@@ -4,7 +4,7 @@ import { postFormData } from "@/handlers/postFormData";
 import { hasErrors } from "@/utils/hasErrors.util";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import ShowPasswordCheckbox from "./ShowPasswordCheckbox";
 
@@ -29,7 +29,7 @@ export default function AirlineLoginForm() {
     mutationFn: (formData: AIRLINELOGIN) =>
       postFormData("auth/airline-login", formData),
     onSuccess: () => {
-      toast.success("account has been created successfully, redirecting ...");
+      toast.success("Logged In Successfully, redirecting ...");
       setTimeout(() => {
         router.replace("/");
       }, 3000);
@@ -103,6 +103,7 @@ export default function AirlineLoginForm() {
 
       <button
         type="submit"
+        disabled={isPending}
         className="w-full rounded-lg bg-gray-900 py-3 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Logging in ..." : "Login"}

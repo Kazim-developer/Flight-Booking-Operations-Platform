@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import TravelerForm from "../components/TravelerForm";
-import AirlineForm from "../components/AirlineForm";
+import TravelerForm from "../components/TravelerSignupForm";
+import AirlineForm from "../components/AirlineSignupForm";
 
 type UserType = "traveler" | "airline" | null;
 

@@ -3,39 +3,42 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import ShowPasswordCheckbox from "./ShowPasswordCheckbox";
+import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { postFormData } from "@/handlers/postFormData";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { hasErrors } from "@/utils/hasErrors.util";
 
-export interface TRAVELERFORM {
-  fullName: string;
+export interface AIRLINEFORM {
+  name: string;
   email: string;
-  phone: string;
+  iataCode: string;
   password: string;
 }
 
-export default function TravelerForm() {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [travelerForm, setTravelerForm] = useState<TRAVELERFORM>({
-    fullName: "",
+export default function AirlineSignupForm() {
+  const [airlineForm, setAirlineForm] = useState<AIRLINEFORM>({
+    name: "",
     email: "",
-    phone: "",
+    iataCode: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const nameRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (travelerForm: TRAVELERFORM) =>
-      postFormData("auth/traveler-signup", travelerForm),
+    mutationFn: (airlineForm: AIRLINEFORM) =>
+      postFormData("auth/airline-signup", airlineForm),
     onSuccess: () => {
-      toast.success("account has been created successfully, redirecting ...");
+      toast.success(
+        "airline account has been created successfully, redirecting ...",
+      );
       setTimeout(() => {
-        router.replace("auth/login");
+        router.replace("/auth/login");
       }, 3000);
     },
     onError: (error) => {
@@ -58,11 +61,11 @@ export default function TravelerForm() {
       <div className={clsx("flex flex-col gap-5")}>
         <div className={clsx("flex flex-col items-center gap-3")}>
           <h2 className="text-2xl font-semibold text-gray-900">
-            Traveler registration
+            Airline company registration
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Create your account to start booking flights.
+          <p className="text-sm text-gray-500">
+            Create an account to manage your airline operations.
           </p>
         </div>
 
@@ -70,90 +73,94 @@ export default function TravelerForm() {
           className={clsx("flex flex-col gap-5")}
           onSubmit={(e) => {
             e.preventDefault();
-            mutate(travelerForm);
+            mutate(airlineForm);
           }}
         >
-          {/* Full name */}
+          {/* Airline name */}
           <div>
             <label
-              htmlFor="fullName"
+              htmlFor="airline-name"
               className="mb-1.5 block text-sm font-medium text-gray-700"
             >
-              Full name *
+              Airline name *
             </label>
 
             <input
-              id="fullName"
-              name="fullName"
-              ref={nameRef}
+              id="airline-name"
+              name="airlineName"
               type="text"
-              placeholder="Ali Raza"
+              ref={nameRef}
+              placeholder="Example Airlines"
               required
               className={clsx(
                 "w-[100%] p-2 focus:outline-none focus:border-black border-1 border-[#ccc] rounded-lg",
               )}
               onChange={(e) =>
-                setTravelerForm({ ...travelerForm, fullName: e.target.value })
+                setAirlineForm({ ...airlineForm, name: e.target.value })
               }
             />
           </div>
-          {/* Email */}
+
+          {/* Contact email */}
           <div>
             <label
-              htmlFor="traveler-email"
+              htmlFor="airline-email"
               className="mb-1.5 block text-sm font-medium text-gray-700"
             >
-              Email address *
+              Contact email *
             </label>
 
             <input
-              id="traveler-email"
+              id="airline-email"
               name="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="contact@airline.com"
               required
               className={clsx(
                 "w-[100%] p-2 focus:outline-none focus:border-black border-1 border-[#ccc] rounded-lg",
               )}
               onChange={(e) =>
-                setTravelerForm({ ...travelerForm, email: e.target.value })
+                setAirlineForm({ ...airlineForm, email: e.target.value })
               }
             />
           </div>
-          {/* Phone */}
+
+          {/* IATA code */}
           <div>
             <label
-              htmlFor="traveler-phone"
+              htmlFor="iata-code"
               className="mb-1.5 block text-sm font-medium text-gray-700"
             >
-              Phone number *
+              IATA code *
             </label>
 
             <input
-              id="traveler-phone"
-              name="phone"
-              type="tel"
-              placeholder="+92 300 1234567"
+              id="iata-code"
+              name="iataCode"
+              type="text"
+              placeholder="e.g. PK"
+              maxLength={2}
               required
               className={clsx(
                 "w-[100%] p-2 focus:outline-none focus:border-black border-1 border-[#ccc] rounded-lg",
               )}
               onChange={(e) =>
-                setTravelerForm({ ...travelerForm, phone: e.target.value })
+                setAirlineForm({ ...airlineForm, iataCode: e.target.value })
               }
             />
           </div>
+
           {/* Password */}
           <div>
             <label
-              htmlFor="traveler-password"
+              htmlFor="airline-password"
               className="mb-1.5 block text-sm font-medium text-gray-700"
             >
               Password *
             </label>
 
             <input
-              id="traveler-password"
+              id="airline-password"
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="Create a password"
@@ -162,21 +169,24 @@ export default function TravelerForm() {
                 "w-[100%] p-2 focus:outline-none focus:border-black border-1 border-[#ccc] rounded-lg",
               )}
               onChange={(e) =>
-                setTravelerForm({ ...travelerForm, password: e.target.value })
+                setAirlineForm({ ...airlineForm, password: e.target.value })
               }
             />
           </div>
+
           <ShowPasswordCheckbox
             showPassword={showPassword}
             setShowPassword={setShowPassword}
           />
+
           <button
             type="submit"
+            disabled={isPending}
             className={clsx(
-              "bg-black text-white p-3 text-bold cursor-pointer rounded-lg",
+              "bg-black text-white p-3 text-bold cursor-pointer rounded-lg transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60",
             )}
           >
-            {isPending ? "Signing in ..." : "Sign Up"}
+            {isPending ? "Creating account ..." : "Create airline account"}
           </button>
         </form>
       </div>

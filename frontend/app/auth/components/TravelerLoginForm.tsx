@@ -29,7 +29,7 @@ export default function TravelerLoginForm() {
     mutationFn: (formData: TRAVELERLOGIN) =>
       postFormData("auth/traveler-login", formData),
     onSuccess: () => {
-      toast.success("account has been created successfully, redirecting ...");
+      toast.success("Logged In Successfully, redirecting ...");
       setTimeout(() => {
         router.replace("/");
       }, 3000);
@@ -103,6 +103,7 @@ export default function TravelerLoginForm() {
 
       <button
         type="submit"
+        disabled={isPending}
         className="w-full rounded-lg bg-gray-900 py-3 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Logging in ..." : "Login"}
