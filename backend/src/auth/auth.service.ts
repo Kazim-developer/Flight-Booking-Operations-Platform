@@ -33,7 +33,7 @@ export class AuthService {
   async travelerSignup(
     dto: TravelerSignupDto,
   ): Promise<TravelerSignupResponseDto> {
-    const existingUser = await this.prisma.traveler.findUnique({
+    const existingUser = await this.prisma.tRAVELER.findUnique({
       where: {
         email: dto.email,
       },
@@ -45,7 +45,7 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const traveler = await this.prisma.traveler.create({
+    const traveler = await this.prisma.tRAVELER.create({
       data: {
         email: dto.email,
         passwordHash,
@@ -65,7 +65,7 @@ export class AuthService {
   async airlineSignup(
     dto: AirlineSignupDto,
   ): Promise<AirlineSignupResponseDto> {
-    const existingAirline = await this.prisma.airline.findUnique({
+    const existingAirline = await this.prisma.aIRLINE.findUnique({
       where: {
         contactEmail: dto.email,
       },
@@ -77,7 +77,7 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const airline = await this.prisma.airline.create({
+    const airline = await this.prisma.aIRLINE.create({
       data: {
         contactEmail: dto.email,
         airlineName: dto.name,
@@ -97,7 +97,7 @@ export class AuthService {
   async travelerLogin(
     dto: TravelerLoginDto,
   ): Promise<TravelerLoginResponseDto> {
-    const traveler = await this.prisma.traveler.findUnique({
+    const traveler = await this.prisma.tRAVELER.findUnique({
       where: {
         email: dto.email,
       },
@@ -134,9 +134,12 @@ export class AuthService {
   }
 
   async airlineLogin(dto: AirlineLoginDto): Promise<AirlineLoginResponseDto> {
-    const airline = await this.prisma.airline.findUnique({
+    const airline = await this.prisma.aIRLINE.findUnique({
       where: {
         contactEmail: dto.email,
+      },
+      include: {
+        users: true,
       },
     });
 
@@ -146,7 +149,7 @@ export class AuthService {
 
     const passwordMatches = await bcrypt.compare(
       dto.password,
-      airline.passwordHash,
+      airline.users?.passwordHash,
     );
 
     if (!passwordMatches) {

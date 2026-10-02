@@ -12,7 +12,15 @@ datasource db {
   provider = "postgresql"
 }
 
-model Traveler {
+enum AirlineUserRole {
+  ADMIN
+}
+
+enum AirlineStaffRole {
+  STAFF
+}
+
+model TRAVELER {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String
@@ -22,12 +30,39 @@ model Traveler {
   updatedAt    DateTime @updatedAt
 }
 
-model Airline {
-  id           String   @id @default(uuid())
-  airlineName  String
-  contactEmail String   @unique
-  iataCode     String   @unique
+model AIRLINE {
+  id            String          @id @default(uuid())
+  airlineName   String
+  contactEmail  String          @unique
+  iataCode      String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  users         AIRLINE_USER[]
+  staff         AIRLINE_STAFF[]
+}
+
+model AIRLINE_USER {
+  id           String          @id @default(uuid())
+  airlineId    String
+  email        String          @unique
   passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         AirlineUserRole @default(ADMIN)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  airline      AIRLINE         @relation(fields: [airlineId], references: [id], onDelete: Cascade)
+}
+
+model AIRLINE_STAFF {
+  id           String           @id @default(uuid())
+  airlineId    String
+  email        String           @unique
+  passwordHash String
+  fullName     String
+  role         AirlineStaffRole @default(STAFF)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  airline      AIRLINE          @relation(fields: [airlineId], references: [id], onDelete: Cascade)
 }
