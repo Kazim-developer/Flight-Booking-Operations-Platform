@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   TravelerSignupDto,
@@ -15,11 +15,24 @@ import {
 import {
   AirlineLoginDto,
   AirlineLoginResponseDto,
+  AirlineStaffLoginDto,
 } from './dto/airlineLogin.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtPayload } from './strategies/jwt.strategy';
+
+interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getMe(@Req() req: AuthenticatedRequest) {
+    return req.user;
+  }
 
   @Post('traveler-signup')
   travelerSignup(
@@ -47,5 +60,10 @@ export class AuthController {
     @Body() airlineInputData: AirlineLoginDto,
   ): Promise<AirlineLoginResponseDto> {
     return this.authService.airlineLogin(airlineInputData);
+  }
+
+  @Post('airline-staff-login')
+  airlineStaffLogin(@Body() dto: AirlineStaffLoginDto) {
+    return this.authService.airlineStaffLogin(dto);
   }
 }

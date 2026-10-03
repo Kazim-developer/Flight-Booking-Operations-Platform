@@ -10,9 +10,18 @@ export class TravelerLoginDto {
 }
 
 export class TravelerLoginResponseDto {
+  @IsString()
   id!: string;
+
+  @IsEmail()
   email!: string;
+
+  @IsString()
   fullName!: string;
+
+  @IsString()
   phone!: string;
+
+  @IsString()
   accessToken!: string;
 }

@@ -9,10 +9,28 @@ export class AirlineLoginDto {
   password!: string;
 }
 
-export class AirlineLoginResponseDto {
-  id!: string;
+export class AirlineStaffLoginDto {
+  @IsEmail()
   email!: string;
-  name!: string;
+
+  @IsString()
+  @MinLength(8)
+  password!: string;
+}
+
+export class AirlineLoginResponseDto {
+  @IsString()
+  id!: string;
+
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  airlineName!: string;
+
+  @IsString()
   iataCode!: string;
+
+  @IsString()
   accessToken!: string;
 }

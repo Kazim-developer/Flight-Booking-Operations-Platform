@@ -20,6 +20,7 @@ import {
 import {
   AirlineLoginDto,
   AirlineLoginResponseDto,
+  AirlineStaffLoginDto,
 } from './dto/airlineLogin.dto';
 import { JwtService } from '@nestjs/jwt';
 
@@ -33,13 +34,13 @@ export class AuthService {
   async travelerSignup(
     dto: TravelerSignupDto,
   ): Promise<TravelerSignupResponseDto> {
-    const existingUser = await this.prisma.tRAVELER.findUnique({
+    const existingTraveler = await this.prisma.tRAVELER.findUnique({
       where: {
         email: dto.email,
       },
     });
 
-    if (existingUser) {
+    if (existingTraveler) {
       throw new ConflictException('Email already registered');
     }
 
@@ -65,32 +66,49 @@ export class AuthService {
   async airlineSignup(
     dto: AirlineSignupDto,
   ): Promise<AirlineSignupResponseDto> {
-    const existingAirline = await this.prisma.aIRLINE.findUnique({
+    const existingAdmin = await this.prisma.aIRLINE_USER.findUnique({
       where: {
-        contactEmail: dto.email,
+        email: dto.email,
       },
     });
 
-    if (existingAirline) {
-      throw new ConflictException('Airline already registered');
+    if (existingAdmin) {
+      throw new ConflictException('Email already registered');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const airline = await this.prisma.aIRLINE.create({
-      data: {
-        contactEmail: dto.email,
-        airlineName: dto.name,
-        iataCode: dto.iataCode,
-        passwordHash,
-      },
+    const result = await this.prisma.$transaction(async (tx) => {
+      const airline = await tx.aIRLINE.create({
+        data: {
+          airlineName: dto.name,
+          contactEmail: dto.email,
+          iataCode: dto.iataCode,
+        },
+      });
+
+      const admin = await tx.aIRLINE_USER.create({
+        data: {
+          airlineId: airline.id,
+          email: dto.email,
+          passwordHash,
+          role: 'ADMIN',
+        },
+      });
+
+      return {
+        airline,
+        admin,
+      };
     });
 
     return {
-      id: airline.id,
-      email: airline.contactEmail,
-      name: airline.airlineName,
-      iataCode: airline.iataCode,
+      id: result.admin.id,
+      airlineId: result.airline.id,
+      airlineName: result.airline.airlineName,
+      email: result.admin.email,
+      role: result.admin.role,
+      iataCode: result.airline.iataCode,
     };
   }
 
@@ -134,22 +152,22 @@ export class AuthService {
   }
 
   async airlineLogin(dto: AirlineLoginDto): Promise<AirlineLoginResponseDto> {
-    const airline = await this.prisma.aIRLINE.findUnique({
+    const airlineUser = await this.prisma.aIRLINE_USER.findUnique({
       where: {
-        contactEmail: dto.email,
+        email: dto.email,
       },
       include: {
-        users: true,
+        airline: true,
       },
     });
 
-    if (!airline) {
+    if (!airlineUser) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
     const passwordMatches = await bcrypt.compare(
       dto.password,
-      airline.users?.passwordHash,
+      airlineUser.passwordHash,
     );
 
     if (!passwordMatches) {
@@ -157,19 +175,57 @@ export class AuthService {
     }
 
     const payload = {
-      sub: airline.id,
-      email: airline.contactEmail,
-      role: 'AIRLINE',
+      sub: airlineUser.id,
+      accountType: 'AIRLINE_USER',
+      role: airlineUser.role,
+      airlineId: airlineUser.airlineId,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
       accessToken,
-      id: airline.id,
-      email: airline.contactEmail,
-      name: airline.airlineName,
-      iataCode: airline.iataCode,
+      id: airlineUser.id,
+      email: airlineUser.email,
+      airlineName: airlineUser.airline.airlineName,
+      iataCode: airlineUser.airline.iataCode,
+    };
+  }
+
+  async airlineStaffLogin(dto: AirlineStaffLoginDto) {
+    const staff = await this.prisma.aIRLINE_STAFF.findUnique({
+      where: {
+        email: dto.email,
+      },
+      include: {
+        airline: true,
+      },
+    });
+
+    if (!staff) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      staff.passwordHash,
+    );
+
+    if (!passwordMatches) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = {
+      sub: staff.id,
+      accountType: 'AIRLINE_STAFF',
+      role: staff.role,
+      airlineId: staff.airlineId,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      accessToken,
     };
   }
 }

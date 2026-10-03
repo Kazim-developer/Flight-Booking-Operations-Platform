@@ -1,11 +1,11 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
 export class AirlineSignupDto {
-  @IsEmail()
-  email!: string;
-
   @IsString()
   name!: string;
+
+  @IsEmail()
+  email!: string;
 
   @IsString()
   iataCode!: string;
@@ -16,8 +16,22 @@ export class AirlineSignupDto {
 }
 
 export class AirlineSignupResponseDto {
+  @IsString()
   id!: string;
+
+  @IsString()
+  airlineId!: string;
+
+  @IsEmail()
   email!: string;
+
+  @IsString()
+  @IsOptional()
   iataCode!: string;
-  name!: string;
+
+  @IsString()
+  airlineName!: string;
+
+  @IsString()
+  role!: string;
 }

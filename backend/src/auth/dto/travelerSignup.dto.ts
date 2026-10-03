@@ -16,8 +16,15 @@ export class TravelerSignupDto {
 }
 
 export class TravelerSignupResponseDto {
+  @IsString()
   id!: string;
+
+  @IsEmail()
   email!: string;
+
+  @IsString()
   phone!: string;
+
+  @IsString()
   fullName!: string;
 }
