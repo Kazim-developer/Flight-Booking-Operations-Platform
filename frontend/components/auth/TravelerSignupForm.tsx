@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
-import ShowPasswordCheckbox from "./ShowPasswordCheckbox";
+import ShowPasswordCheckbox from "./auth/ShowPasswordCheckbox";
 import { useMutation } from "@tanstack/react-query";
 import { postFormData } from "@/handlers/postFormData";
 import { toast } from "react-toastify";

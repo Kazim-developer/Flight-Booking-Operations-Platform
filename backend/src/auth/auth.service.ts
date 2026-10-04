@@ -13,15 +13,8 @@ import {
   AirlineSignupDto,
   AirlineSignupResponseDto,
 } from './dto/airlineSignup.dto';
-import {
-  TravelerLoginDto,
-  TravelerLoginResponseDto,
-} from './dto/travelerLogin.dto';
-import {
-  AirlineLoginDto,
-  AirlineLoginResponseDto,
-  AirlineStaffLoginDto,
-} from './dto/airlineLogin.dto';
+import { TravelerLoginDto } from './dto/travelerLogin.dto';
+import { AirlineLoginDto, AirlineStaffLoginDto } from './dto/airlineLogin.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -112,9 +105,7 @@ export class AuthService {
     };
   }
 
-  async travelerLogin(
-    dto: TravelerLoginDto,
-  ): Promise<TravelerLoginResponseDto> {
+  async travelerLogin(dto: TravelerLoginDto) {
     const traveler = await this.prisma.tRAVELER.findUnique({
       where: {
         email: dto.email,
@@ -151,7 +142,7 @@ export class AuthService {
     };
   }
 
-  async airlineLogin(dto: AirlineLoginDto): Promise<AirlineLoginResponseDto> {
+  async airlineLogin(dto: AirlineLoginDto) {
     const airlineUser = await this.prisma.aIRLINE_USER.findUnique({
       where: {
         email: dto.email,

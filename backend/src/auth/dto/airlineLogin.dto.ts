@@ -30,7 +30,4 @@ export class AirlineLoginResponseDto {
 
   @IsString()
   iataCode!: string;
-
-  @IsString()
-  accessToken!: string;
 }

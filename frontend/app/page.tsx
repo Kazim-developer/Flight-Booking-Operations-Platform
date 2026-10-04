@@ -1,3 +1,9 @@
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 export default function Home() {
-  return <h1>Hello world</h1>;
+  return (
+    <ProtectedRoute>
+      <h1>Hello world</h1>;
+    </ProtectedRoute>
+  );
 }

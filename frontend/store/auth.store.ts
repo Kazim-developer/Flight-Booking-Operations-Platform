@@ -1,9 +1,13 @@
 import { create } from "zustand";
 
+export type UserType = "TRAVELER" | "AIRLINE" | "AIRLINE_STAFF";
+
+export type UserRole = "TRAVELER" | "AIRLINE_ADMIN" | "AIRLINE_STAFF";
+
 export interface AuthUser {
   id: string;
-  role: string;
-  userType: string;
+  role: UserRole;
+  userType: UserType;
 }
 
 interface AuthState {
@@ -13,7 +17,7 @@ interface AuthState {
 
   setUser: (user: AuthUser) => void;
   clearAuth: () => void;
-  setLoading: (loading: boolean) => void;
+  setLoading: (isLoading: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -35,8 +39,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       isLoading: false,
     }),
 
-  setLoading: (loading) =>
+  setLoading: (isLoading) =>
     set({
-      isLoading: loading,
+      isLoading,
     }),
 }));

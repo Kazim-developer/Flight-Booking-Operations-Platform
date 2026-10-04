@@ -1,3 +1,4 @@
+import { Optional } from '@nestjs/common';
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class TravelerLoginDto {
@@ -17,11 +18,10 @@ export class TravelerLoginResponseDto {
   email!: string;
 
   @IsString()
+  @Optional()
   fullName!: string;
 
   @IsString()
+  @Optional()
   phone!: string;
-
-  @IsString()
-  accessToken!: string;
 }

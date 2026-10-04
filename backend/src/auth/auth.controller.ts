@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   TravelerSignupDto,
@@ -49,17 +57,44 @@ export class AuthController {
   }
 
   @Post('traveler-login')
-  travelerLogin(
+  async travelerLogin(
     @Body() travelerInputData: TravelerLoginDto,
   ): Promise<TravelerLoginResponseDto> {
-    return this.authService.travelerLogin(travelerInputData);
+    const result = await this.authService.travelerLogin(travelerInputData);
+
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    return {
+      id: result.id,
+      email: result.email,
+    };
   }
 
   @Post('airline-login')
-  airlineLogin(
+  async airlineLogin(
     @Body() airlineInputData: AirlineLoginDto,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<AirlineLoginResponseDto> {
-    return this.authService.airlineLogin(airlineInputData);
+    const result = await this.authService.airlineLogin(airlineInputData);
+
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    return {
+      id: result.id,
+      email: result.email,
+      airlineName: result.airlineName,
+      iataCode: result.iataCode,
+    };
   }
 
   @Post('airline-staff-login')
