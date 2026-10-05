@@ -16,10 +16,7 @@ import {
   AirlineSignupDto,
   AirlineSignupResponseDto,
 } from './dto/airlineSignup.dto';
-import {
-  TravelerLoginDto,
-  TravelerLoginResponseDto,
-} from './dto/travelerLogin.dto';
+import { TravelerLoginDto } from './dto/travelerLogin.dto';
 import {
   AirlineLoginDto,
   AirlineLoginResponseDto,
@@ -27,6 +24,7 @@ import {
 } from './dto/airlineLogin.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtPayload } from './strategies/jwt.strategy';
+import type { Response } from 'express';
 
 interface AuthenticatedRequest extends Request {
   user: JwtPayload;
@@ -59,7 +57,8 @@ export class AuthController {
   @Post('traveler-login')
   async travelerLogin(
     @Body() travelerInputData: TravelerLoginDto,
-  ): Promise<TravelerLoginResponseDto> {
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.authService.travelerLogin(travelerInputData);
 
     res.cookie('access_token', result.accessToken, {
@@ -98,7 +97,21 @@ export class AuthController {
   }
 
   @Post('airline-staff-login')
-  airlineStaffLogin(@Body() dto: AirlineStaffLoginDto) {
-    return this.authService.airlineStaffLogin(dto);
+  async airlineStaffLogin(
+    @Body() dto: AirlineStaffLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.airlineStaffLogin(dto);
+
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    return {
+      success: true,
+    };
   }
 }
