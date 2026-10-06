@@ -2,7 +2,7 @@
 
 import { postFormData } from "@/handlers/postFormData";
 import { hasErrors } from "@/utils/hasErrors.util";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -25,14 +25,18 @@ export default function AirlineLoginForm() {
 
   const router = useRouter();
 
+  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
     mutationFn: (formData: AIRLINELOGIN) =>
       postFormData("auth/airline-login", formData),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Logged In Successfully, redirecting ...");
-      setTimeout(() => {
-        router.replace("/");
-      }, 3000);
+      await queryClient.refetchQueries({
+        queryKey: ["auth", "me"],
+      });
+
+      router.replace("/");
     },
     onError: (error) => {
       if (hasErrors(error)) {

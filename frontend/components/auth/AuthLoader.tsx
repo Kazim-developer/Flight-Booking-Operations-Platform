@@ -12,25 +12,18 @@ interface AuthLoaderProps {
 export default function AuthLoader({ children }: AuthLoaderProps) {
   const setUser = useAuthStore((state) => state.setUser);
   const clearAuth = useAuthStore((state) => state.clearAuth);
-  const setLoading = useAuthStore((state) => state.setLoading);
 
-  const { data: user, isLoading, isError, isSuccess } = useCurrentUser();
+  const { data: user, isLoading, isSuccess, isError } = useCurrentUser();
 
   useEffect(() => {
-    if (isLoading) {
-      setLoading(true);
-      return;
-    }
-
     if (isSuccess && user) {
       setUser(user);
-      return;
     }
 
     if (isError) {
       clearAuth();
     }
-  }, [isLoading, isSuccess, isError, user, setUser, clearAuth, setLoading]);
+  }, [isSuccess, isError, user, setUser, clearAuth]);
 
   if (isLoading) {
     return (

@@ -2,7 +2,7 @@
 
 import { postFormData } from "@/handlers/postFormData";
 import { hasErrors } from "@/utils/hasErrors.util";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -25,16 +25,26 @@ export default function TravelerLoginForm() {
 
   const router = useRouter();
 
+  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
-    mutationFn: (formData: TRAVELERLOGIN) =>
-      postFormData("auth/traveler-login", formData),
-    onSuccess: () => {
-      toast.success("Logged In Successfully, redirecting ...");
-      setTimeout(() => {
-        router.replace("/");
-      }, 3000);
+    mutationFn: (formData: TRAVELERLOGIN) => {
+      console.log("LOGIN MUTATION STARTED", formData);
+
+      return postFormData("auth/traveler-login", formData);
     },
+
+    onSuccess: (data) => {
+      console.log("LOGIN SUCCESS", data);
+
+      toast.success("Logged In Successfully");
+
+      router.replace("/");
+    },
+
     onError: (error) => {
+      console.log("LOGIN ERROR", error);
+
       if (hasErrors(error)) {
         Object.values(error.errors).forEach((msg) => {
           toast.error(String(msg));

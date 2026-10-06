@@ -23,5 +23,6 @@ export function useCurrentUser() {
     },
 
     retry: false,
+    staleTime: 0,
   });
 }
