@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReactToastifyProviders from "@/providers/ReactToastifyProviders";
 import TankstackProvider from "@/providers/TanstackProvider";
+import AuthLoader from "@/components/auth/AuthLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <TankstackProvider>
-          <ReactToastifyProviders>{children}</ReactToastifyProviders>
+          <AuthLoader>
+            <ReactToastifyProviders>{children}</ReactToastifyProviders>
+          </AuthLoader>
         </TankstackProvider>
       </body>
     </html>
