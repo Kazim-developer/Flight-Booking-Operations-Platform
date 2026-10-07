@@ -29,22 +29,20 @@ export default function TravelerLoginForm() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (formData: TRAVELERLOGIN) => {
-      console.log("LOGIN MUTATION STARTED", formData);
-
       return postFormData("auth/traveler-login", formData);
     },
 
-    onSuccess: (data) => {
-      console.log("LOGIN SUCCESS", data);
-
+    onSuccess: async (data) => {
       toast.success("Logged In Successfully");
+
+      await queryClient.invalidateQueries({
+        queryKey: ["auth", "me"],
+      });
 
       router.replace("/");
     },
 
     onError: (error) => {
-      console.log("LOGIN ERROR", error);
-
       if (hasErrors(error)) {
         Object.values(error.errors).forEach((msg) => {
           toast.error(String(msg));

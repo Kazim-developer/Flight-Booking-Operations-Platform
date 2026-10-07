@@ -34,12 +34,9 @@ export default function AirlineSignupForm() {
     mutationFn: (airlineForm: AIRLINEFORM) =>
       postFormData("auth/airline-signup", airlineForm),
     onSuccess: () => {
-      toast.success(
-        "airline account has been created successfully, redirecting ...",
-      );
-      setTimeout(() => {
-        router.replace("/auth/login");
-      }, 3000);
+      toast.success("airline account has been created successfully");
+
+      router.replace("/auth/login");
     },
     onError: (error) => {
       if (hasErrors(error)) {

@@ -33,10 +33,9 @@ export default function TravelerSignupForm() {
     mutationFn: (travelerForm: TRAVELERFORM) =>
       postFormData("auth/traveler-signup", travelerForm),
     onSuccess: () => {
-      toast.success("account has been created successfully, redirecting ...");
-      setTimeout(() => {
-        router.replace("/auth/login");
-      }, 3000);
+      toast.success("account has been created successfully");
+
+      router.replace("/auth/login");
     },
     onError: (error) => {
       if (hasErrors(error)) {

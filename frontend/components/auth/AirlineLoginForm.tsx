@@ -31,7 +31,8 @@ export default function AirlineLoginForm() {
     mutationFn: (formData: AIRLINELOGIN) =>
       postFormData("auth/airline-login", formData),
     onSuccess: async () => {
-      toast.success("Logged In Successfully, redirecting ...");
+      toast.success("Logged In Successfully");
+
       await queryClient.refetchQueries({
         queryKey: ["auth", "me"],
       });
