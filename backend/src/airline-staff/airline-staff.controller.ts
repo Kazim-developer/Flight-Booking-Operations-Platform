@@ -14,7 +14,10 @@ import { Request } from 'express';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AirlineAdminGuard } from '../auth/guards/airline-admin.guard';
-import { JwtPayload } from '../auth/strategies/jwt.strategy';
+import {
+  AirlineStaffJwtPayload,
+  AirlineUserJwtPayload,
+} from '../auth/strategies/jwt.strategy';
 
 import { AirlineStaffService } from './airline-staff.service';
 
@@ -22,7 +25,7 @@ import { CreateStaffDto } from './dto/create-staff.dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto/update-staff.dto';
 
 interface AuthenticatedRequest extends Request {
-  user: JwtPayload;
+  user: AirlineStaffJwtPayload | AirlineUserJwtPayload;
 }
 
 @Controller('airline-staff')
@@ -32,12 +35,12 @@ export class AirlineStaffController {
 
   @Post()
   createStaff(@Req() req: AuthenticatedRequest, @Body() dto: CreateStaffDto) {
-    return this.airlineStaffService.createStaff(req.user.airlineId!, dto);
+    return this.airlineStaffService.createStaff(req.user.airlineId, dto);
   }
 
   @Get()
   getStaff(@Req() req: AuthenticatedRequest) {
-    return this.airlineStaffService.getStaff(req.user.airlineId!);
+    return this.airlineStaffService.getStaff(req.user.airlineId);
   }
 
   @Patch(':id')
@@ -47,7 +50,7 @@ export class AirlineStaffController {
     @Body() dto: UpdateStaffDto,
   ) {
     return this.airlineStaffService.updateStaff(
-      req.user.airlineId!,
+      req.user.airlineId,
       staffId,
       dto,
     );
@@ -55,6 +58,6 @@ export class AirlineStaffController {
 
   @Delete(':id')
   deleteStaff(@Req() req: AuthenticatedRequest, @Param('id') staffId: string) {
-    return this.airlineStaffService.deleteStaff(req.user.airlineId!, staffId);
+    return this.airlineStaffService.deleteStaff(req.user.airlineId, staffId);
   }
 }

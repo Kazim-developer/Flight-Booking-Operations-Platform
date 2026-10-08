@@ -16,7 +16,11 @@ import {
 import { TravelerLoginDto } from './dto/travelerLogin.dto';
 import { AirlineLoginDto, AirlineStaffLoginDto } from './dto/airlineLogin.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './strategies/jwt.strategy';
+import {
+  AirlineStaffJwtPayload,
+  AirlineUserJwtPayload,
+  TravelerJwtPayload,
+} from './strategies/jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -126,7 +130,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload: JwtPayload = {
+    const payload: TravelerJwtPayload = {
       sub: traveler.id,
       userType: 'TRAVELER',
       role: 'TRAVELER',
@@ -167,7 +171,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload: JwtPayload = {
+    const payload: AirlineUserJwtPayload = {
       sub: airlineUser.id,
       userType: 'AIRLINE_USER',
       role: 'ADMIN',
@@ -209,7 +213,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload: JwtPayload = {
+    const payload: AirlineStaffJwtPayload = {
       sub: staff.id,
       userType: 'AIRLINE_STAFF',
       role: 'STAFF',

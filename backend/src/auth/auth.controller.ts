@@ -23,11 +23,16 @@ import {
   AirlineStaffLoginDto,
 } from './dto/airlineLogin.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { JwtPayload } from './strategies/jwt.strategy';
+import {
+  AirlineStaffJwtPayload,
+  AirlineUserJwtPayload,
+  JwtPayload,
+  TravelerJwtPayload,
+} from './strategies/jwt.strategy';
 import type { Response } from 'express';
 
 interface AuthenticatedRequest extends Request {
-  user: JwtPayload;
+  user: AirlineUserJwtPayload | TravelerJwtPayload | AirlineStaffJwtPayload;
 }
 
 @Controller('auth')
@@ -37,7 +42,13 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@Req() req: AuthenticatedRequest) {
-    return req.user;
+    return {
+      id: req.user.sub,
+      email: req.user.email,
+      userType: req.user.userType,
+      role: req.user.role,
+      airlineId: req.user.airlineId,
+    };
   }
 
   @Post('traveler-signup')

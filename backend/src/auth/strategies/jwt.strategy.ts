@@ -3,27 +3,31 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { Request } from 'express';
 
+export type TravelerJwtPayload = {
+  sub: string;
+  userType: 'TRAVELER';
+  role: 'TRAVELER';
+  email: string;
+};
+
+export type AirlineUserJwtPayload = {
+  sub: string;
+  userType: 'AIRLINE_USER';
+  role: 'ADMIN';
+  email: string;
+  airlineId: string;
+};
+
+export type AirlineStaffJwtPayload = {
+  sub: string;
+  userType: 'AIRLINE_STAFF';
+  role: 'STAFF';
+  email: string;
+  airlineId: string;
+};
+
 export type JwtPayload =
-  | {
-      sub: string;
-      userType: 'TRAVELER';
-      role: 'TRAVELER';
-      email: string;
-    }
-  | {
-      sub: string;
-      userType: 'AIRLINE_USER';
-      role: 'ADMIN';
-      email: string;
-      airlineId: string;
-    }
-  | {
-      sub: string;
-      userType: 'AIRLINE_STAFF';
-      role: 'STAFF';
-      email: string;
-      airlineId: string;
-    };
+  TravelerJwtPayload | AirlineUserJwtPayload | AirlineStaffJwtPayload;
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
