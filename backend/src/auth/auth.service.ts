@@ -16,6 +16,7 @@ import {
 import { TravelerLoginDto } from './dto/travelerLogin.dto';
 import { AirlineLoginDto, AirlineStaffLoginDto } from './dto/airlineLogin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './strategies/jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -125,10 +126,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = {
+    const payload: JwtPayload = {
       sub: traveler.id,
-      email: traveler.email,
+      userType: 'TRAVELER',
       role: 'TRAVELER',
+      email: traveler.email,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);
@@ -165,10 +167,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = {
+    const payload: JwtPayload = {
       sub: airlineUser.id,
-      accountType: 'AIRLINE_USER',
-      role: airlineUser.role,
+      userType: 'AIRLINE_USER',
+      role: 'ADMIN',
+      email: airlineUser.email,
       airlineId: airlineUser.airlineId,
     };
 
@@ -206,10 +209,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = {
+    const payload: JwtPayload = {
       sub: staff.id,
-      accountType: 'AIRLINE_STAFF',
-      role: staff.role,
+      userType: 'AIRLINE_STAFF',
+      role: 'STAFF',
+      email: staff.email,
       airlineId: staff.airlineId,
     };
 

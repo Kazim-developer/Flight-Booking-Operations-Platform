@@ -7,7 +7,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AirlineStaffModule } from './airline-staff/airline-staff.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, PrismaModule, AirlineStaffModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    PrismaModule,
+    AirlineStaffModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

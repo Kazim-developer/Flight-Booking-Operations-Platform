@@ -18,7 +18,7 @@ export class AirlineAdminGuard implements CanActivate {
 
     const user = request.user;
 
-    if (user.accountType !== 'AIRLINE_USER' || user.role !== 'ADMIN') {
+    if (user.userType !== 'AIRLINE_USER' || user.role !== 'ADMIN') {
       throw new ForbiddenException(
         'Only airline administrators can perform this action',
       );

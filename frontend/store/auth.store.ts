@@ -1,13 +1,15 @@
 import { create } from "zustand";
 
-export type UserType = "TRAVELER" | "AIRLINE" | "AIRLINE_STAFF";
+export type UserType = "TRAVELER" | "AIRLINE_USER" | "AIRLINE_STAFF";
 
-export type UserRole = "TRAVELER" | "AIRLINE_ADMIN" | "AIRLINE_STAFF";
+export type UserRole = "TRAVELER" | "ADMIN" | "STAFF";
 
 export interface AuthUser {
   id: string;
-  role: UserRole;
   userType: UserType;
+  role: UserRole;
+  email?: string;
+  airlineId?: string;
 }
 
 interface AuthState {
