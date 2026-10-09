@@ -4,28 +4,25 @@ import {
   Delete,
   Get,
   Param,
-  Post,
+  ParseUUIDPipe,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AirlineAdminGuard } from '../auth/guards/airline-admin.guard';
-import {
-  AirlineStaffJwtPayload,
-  AirlineUserJwtPayload,
-} from '../auth/strategies/jwt.strategy';
+import type { AirlineUserJwtPayload } from '../auth/strategies/jwt.strategy';
 
 import { AirlineStaffService } from './airline-staff.service';
-
 import { CreateStaffDto } from './dto/create-staff.dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto/update-staff.dto';
 
 interface AuthenticatedRequest extends Request {
-  user: AirlineStaffJwtPayload | AirlineUserJwtPayload;
+  user: AirlineUserJwtPayload;
 }
 
 @Controller('airline-staff')
@@ -46,7 +43,7 @@ export class AirlineStaffController {
   @Patch(':id')
   updateStaff(
     @Req() req: AuthenticatedRequest,
-    @Param('id') staffId: string,
+    @Param('id', ParseUUIDPipe) staffId: string,
     @Body() dto: UpdateStaffDto,
   ) {
     return this.airlineStaffService.updateStaff(
@@ -57,7 +54,10 @@ export class AirlineStaffController {
   }
 
   @Delete(':id')
-  deleteStaff(@Req() req: AuthenticatedRequest, @Param('id') staffId: string) {
+  deleteStaff(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) staffId: string,
+  ) {
     return this.airlineStaffService.deleteStaff(req.user.airlineId, staffId);
   }
 }

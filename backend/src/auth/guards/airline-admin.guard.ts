@@ -4,8 +4,9 @@ import {
   Injectable,
   ForbiddenException,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { JwtPayload } from '../strategies/jwt.strategy';
+
+import type { Request } from 'express';
+import type { JwtPayload } from '../strategies/jwt.strategy';
 
 interface AuthenticatedRequest extends Request {
   user: JwtPayload;
@@ -18,7 +19,12 @@ export class AirlineAdminGuard implements CanActivate {
 
     const user = request.user;
 
-    if (user.userType !== 'AIRLINE_USER' || user.role !== 'ADMIN') {
+    if (
+      !user ||
+      user.userType !== 'AIRLINE_USER' ||
+      user.role !== 'ADMIN' ||
+      !user.airlineId
+    ) {
       throw new ForbiddenException(
         'Only airline administrators can perform this action',
       );

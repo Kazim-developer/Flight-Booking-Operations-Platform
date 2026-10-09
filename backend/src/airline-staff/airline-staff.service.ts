@@ -1,10 +1,10 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
+import { Prisma } from 'generated/prisma/browser';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,11 +16,20 @@ import { UpdateStaffDto } from './dto/update-staff.dto/update-staff.dto';
 export class AirlineStaffService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private handleDatabaseError(error: unknown): never {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      throw new ConflictException('Email already registered');
+    }
+
+    throw error;
+  }
+
   async createStaff(airlineId: string, dto: CreateStaffDto) {
     const existingStaff = await this.prisma.aIRLINE_STAFF.findUnique({
-      where: {
-        email: dto.email,
-      },
+      where: { email: dto.email },
     });
 
     if (existingStaff) {
@@ -29,29 +38,33 @@ export class AirlineStaffService {
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const staff = await this.prisma.aIRLINE_STAFF.create({
-      data: {
-        airlineId,
-        email: dto.email,
-        fullName: dto.fullName,
-        passwordHash,
-      },
-    });
+    try {
+      const staff = await this.prisma.aIRLINE_STAFF.create({
+        data: {
+          airlineId,
+          email: dto.email,
+          fullName: dto.fullName,
+          passwordHash,
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          airlineId: true,
+          createdAt: true,
+        },
+      });
 
-    return {
-      id: staff.id,
-      email: staff.email,
-      fullName: staff.fullName,
-      role: staff.role,
-      airlineId: staff.airlineId,
-    };
+      return staff;
+    } catch (error: unknown) {
+      this.handleDatabaseError(error);
+    }
   }
 
   async getStaff(airlineId: string) {
     return this.prisma.aIRLINE_STAFF.findMany({
-      where: {
-        airlineId,
-      },
+      where: { airlineId },
       select: {
         id: true,
         email: true,
@@ -67,9 +80,10 @@ export class AirlineStaffService {
   }
 
   async updateStaff(airlineId: string, staffId: string, dto: UpdateStaffDto) {
-    const staff = await this.prisma.aIRLINE_STAFF.findUnique({
+    const staff = await this.prisma.aIRLINE_STAFF.findFirst({
       where: {
         id: staffId,
+        airlineId,
       },
     });
 
@@ -77,31 +91,17 @@ export class AirlineStaffService {
       throw new NotFoundException('Staff member not found');
     }
 
-    if (staff.airlineId !== airlineId) {
-      throw new ForbiddenException(
-        'You cannot modify staff from another airline',
-      );
-    }
+    const data: Prisma.AIRLINE_STAFFUpdateInput = {};
 
-    if (dto.email && dto.email !== staff.email) {
+    if (dto.email !== undefined && dto.email !== staff.email) {
       const existingStaff = await this.prisma.aIRLINE_STAFF.findUnique({
-        where: {
-          email: dto.email,
-        },
+        where: { email: dto.email },
       });
 
       if (existingStaff) {
         throw new ConflictException('Email already registered');
       }
-    }
 
-    const data: {
-      email?: string;
-      fullName?: string;
-      passwordHash?: string;
-    } = {};
-
-    if (dto.email !== undefined) {
       data.email = dto.email;
     }
 
@@ -113,44 +113,59 @@ export class AirlineStaffService {
       data.passwordHash = await bcrypt.hash(dto.password, 12);
     }
 
-    const updatedStaff = await this.prisma.aIRLINE_STAFF.update({
-      where: {
-        id: staffId,
-      },
-      data,
-    });
+    if (Object.keys(data).length === 0) {
+      throw new ConflictException('No changes provided');
+    }
 
-    return {
-      id: updatedStaff.id,
-      email: updatedStaff.email,
-      fullName: updatedStaff.fullName,
-      role: updatedStaff.role,
-      airlineId: updatedStaff.airlineId,
-    };
+    try {
+      // Recheck airline ownership in the mutation itself.
+      const result = await this.prisma.aIRLINE_STAFF.updateMany({
+        where: {
+          id: staffId,
+          airlineId,
+        },
+        data,
+      });
+
+      if (result.count === 0) {
+        throw new NotFoundException('Staff member not found');
+      }
+
+      return this.prisma.aIRLINE_STAFF.findFirstOrThrow({
+        where: {
+          id: staffId,
+          airlineId,
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          airlineId: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    } catch (error: unknown) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      this.handleDatabaseError(error);
+    }
   }
 
   async deleteStaff(airlineId: string, staffId: string) {
-    const staff = await this.prisma.aIRLINE_STAFF.findUnique({
+    const result = await this.prisma.aIRLINE_STAFF.deleteMany({
       where: {
         id: staffId,
+        airlineId,
       },
     });
 
-    if (!staff) {
+    if (result.count === 0) {
       throw new NotFoundException('Staff member not found');
     }
-
-    if (staff.airlineId !== airlineId) {
-      throw new ForbiddenException(
-        'You cannot delete staff from another airline',
-      );
-    }
-
-    await this.prisma.aIRLINE_STAFF.delete({
-      where: {
-        id: staffId,
-      },
-    });
 
     return {
       message: 'Staff member deleted successfully',

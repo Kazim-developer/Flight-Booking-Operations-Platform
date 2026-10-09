@@ -26,7 +26,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   AirlineStaffJwtPayload,
   AirlineUserJwtPayload,
-  JwtPayload,
   TravelerJwtPayload,
 } from './strategies/jwt.strategy';
 import type { Response } from 'express';
@@ -42,12 +41,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
+
     return {
-      id: req.user.sub,
-      email: req.user.email,
-      userType: req.user.userType,
-      role: req.user.role,
-      airlineId: req.user.airlineId,
+      id: user.sub,
+      email: user.email,
+      userType: user.userType,
+      role: user.role,
+      airlineId: user.userType === 'TRAVELER' ? undefined : user.airlineId,
     };
   }
 
