@@ -18,7 +18,9 @@ export class AirlineStaffService {
 
   private handleDatabaseError(error: unknown): never {
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
       error.code === 'P2002'
     ) {
       throw new ConflictException('Email already registered');
