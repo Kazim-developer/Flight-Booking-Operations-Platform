@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AirlineStaffModule } from './airline-staff/airline-staff.module';
+import { FlightsModule } from './flights/flights.module';
+import { BookingsModule } from './bookings/bookings.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { AirlineStaffModule } from './airline-staff/airline-staff.module';
     AuthModule,
     PrismaModule,
     AirlineStaffModule,
+    BookingsModule,
+    FlightsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

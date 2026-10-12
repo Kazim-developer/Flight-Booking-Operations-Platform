@@ -40,6 +40,8 @@ model AIRLINE {
 
   users         AIRLINE_USER[]
   staff         AIRLINE_STAFF[]
+  flights  Flight[]
+  bookings Booking[]
 }
 
 model AIRLINE_USER {
@@ -64,5 +66,65 @@ model AIRLINE_STAFF {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
+  bookings Booking[]
+
   airline      AIRLINE          @relation(fields: [airlineId], references: [id], onDelete: Cascade)
+}
+
+
+enum FlightStatus {
+  SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model Flight {
+  id             String       @id @default(uuid())
+  airlineId      String
+  flightNumber   String
+  origin         String
+  destination    String
+  departureAt    DateTime
+  arrivalAt      DateTime
+  price          Float
+  totalSeats     Int
+  availableSeats Int
+  status         FlightStatus @default(SCHEDULED)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  airline        AIRLINE      @relation(fields: [airlineId], references: [id], onDelete: Cascade)
+  bookings       Booking[]
+
+  @@unique([airlineId, flightNumber, departureAt])
+  @@index([airlineId, status, departureAt])
+}
+
+model Booking {
+  id                String        @id @default(uuid())
+  bookingReference  String        @unique @default(uuid())
+  airlineId         String
+  flightId          String
+  bookedByStaffId   String
+  passengerFullName String
+  passengerEmail    String
+  passengerPhone    String
+  seatCount         Int           @default(1)
+  totalPrice        Float
+  status            BookingStatus @default(CONFIRMED)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  airline           AIRLINE       @relation(fields: [airlineId], references: [id], onDelete: Cascade)
+  flight            Flight        @relation(fields: [flightId], references: [id], onDelete: Restrict)
+  bookedByStaff     AIRLINE_STAFF @relation(fields: [bookedByStaffId], references: [id], onDelete: Restrict)
+
+  @@index([airlineId, createdAt])
+  @@index([flightId, status])
+  @@index([bookedByStaffId])
 }

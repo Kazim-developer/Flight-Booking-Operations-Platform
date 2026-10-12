@@ -37,7 +37,7 @@ export default function StaffLoginForm() {
         queryKey: ["auth", "me"],
       });
 
-      router.replace("/airline/dashboard");
+      router.replace("/airline/staff/dashboard");
     },
 
     onError: (error: Error) => {
