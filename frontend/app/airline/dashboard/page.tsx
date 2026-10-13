@@ -98,20 +98,18 @@ export default function AirlineDashboardPage() {
           </Link>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-100 text-xl">
-              ✈
-            </div>
-
-            <h3 className="mt-5 font-semibold">Flight operations</h3>
-
-            <p className="mt-2 text-sm leading-6 text-gray-500">
-              A place for flight scheduling and management as those features are
-              implemented.
+            <h2 className="text-lg font-semibold text-gray-900">
+              Flight Management
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Create flights, set fares, and manage seat capacity.
             </p>
-
-            <span className="mt-5 inline-block text-xs font-medium text-gray-500">
-              Not implemented yet
-            </span>
+            <Link
+              href="/airline/dashboard/flights"
+              className="mt-5 inline-flex rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              Manage flights →
+            </Link>
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6">
