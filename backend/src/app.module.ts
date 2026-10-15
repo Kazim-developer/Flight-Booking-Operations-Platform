@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AirlineStaffModule } from './airline-staff/airline-staff.module';
 import { FlightsModule } from './flights/flights.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { TravelerModule } from './traveler/traveler.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BookingsModule } from './bookings/bookings.module';
     AirlineStaffModule,
     BookingsModule,
     FlightsModule,
+    TravelerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

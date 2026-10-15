@@ -2,10 +2,16 @@ import { AIRLINEFORM } from "@/components/auth/AirlineSignupForm";
 import { AIRLINELOGIN } from "@/components/auth/AirlineLoginForm";
 import { TRAVELERFORM } from "@/components/auth/TravelerSignupForm";
 import { TRAVELERLOGIN } from "@/components/auth/TravelerLoginForm";
+import { CreateBookingData } from "@/app/traveler/flights/page";
 
 export const postFormData = async (
   route: string,
-  formData: TRAVELERFORM | AIRLINEFORM | TRAVELERLOGIN | AIRLINELOGIN,
+  formData:
+    | TRAVELERFORM
+    | AIRLINEFORM
+    | TRAVELERLOGIN
+    | AIRLINELOGIN
+    | CreateBookingData,
 ) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${route}`, {
     method: "POST",
